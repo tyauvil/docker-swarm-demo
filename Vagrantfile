@@ -3,15 +3,16 @@
 
 Vagrant.configure(2) do |config|
 
-  config.vm.box = "ubuntu/xenial64"
+  config.vm.box = "boxcutter/ubuntu1604"
   
   disk = "disk.vdi"
   
   config.vm.provider "virtualbox" do | vbox |
     unless File.exist?(disk)
       vbox.customize ['createhd', '--filename', disk, '--size', 10 * 1024]
+      #vbox.customize ["storagectl", :id, "--name", "SCSI controller", "--add", "scsi"]
     end
-    vbox.customize ['storageattach', :id, '--storagectl', 'SCSI Controller', '--port', 3, '--device', 0, '--type', 'hdd', '--medium', disk]
+    vbox.customize ['storageattach', :id, '--storagectl', 'SATA Controller', '--port', 1, '--device', 0, '--type', 'hdd', '--medium', disk]
   end
   
   ## For masterless, mount your salt file root
