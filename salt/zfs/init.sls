@@ -7,12 +7,13 @@ zfs_packages:
 zdata:
   zpool.present:
     - config:
-      import: false
-      force: true
+        import: false
+        force: true
     - layout:
-      zpool:
-        /dev/sdb
- 
- /var/lib/docker:
-   zfs.volume_present:
-     - create_parent: true
+        mirror-0:
+          /dev/sdb
+          /dev/sdc
+
+zdata/docker:
+  zfs.filesystem_present:
+    - create_parent: true  
