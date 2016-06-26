@@ -15,7 +15,3 @@ worker-1:
 worker-2:
   host.present:
     - ip: 192.168.50.12
-
-ceph-1:
-  host.present:
-    - ip: 192.168.50.13
