@@ -3,72 +3,49 @@
 
 Vagrant.configure(2) do |config|
 
-  config.vm.box = "boxcutter/ubuntu1604"
+  config.vm.box = "ubuntu/trusty64"
+
+  if Vagrant.has_plugin?("vagrant-cachier")
+    config.cache.scope = :box
+  end
   
-  config.vm.define "master" do |master|
+  config.vm.define :"manager-1" do |manager|
+
+    manager.vm.hostname = "manager-1"
+    manager.vm.network :private_network, ip: "192.168.50.10"
+    manager.vm.provider "virtualbox" do | vbox |
     
-    config.vm.network "private_network", ip: "192.168.50.10"
-    
-    master_disk1 = "master_disk1.vdi"
-    master_disk2 = "master_disk2.vdi"
-  
-    config.vm.provider "virtualbox" do | vbox |
-      
       vbox.memory = 1024
       vbox.cpus = 1
       
-      unless File.exist?(master_disk1)
-        vbox.customize ['createhd', '--filename', master_disk1, '--size', 10 * 1024]
-        vbox.customize ['createhd', '--filename', master_disk2, '--size', 10 * 1024]
-      end
-      vbox.customize ['storageattach', :id, '--storagectl', 'SATA Controller', '--port', 1, '--device', 0, '--type', 'hdd', '--medium', master_disk1]
-      vbox.customize ['storageattach', :id, '--storagectl', 'SATA Controller', '--port', 2, '--device', 0, '--type', 'hdd', '--medium', master_disk2]
     end
-  
   end
   
-  config.vm.define "node1" do |node|
-    
-    config.vm.network "private_network", ip: "192.168.50.1"
-    
-    node1_disk1 = "node1_disk1.vdi"
-    node1_disk2 = "node1_disk2.vdi"
+  (1..2).each do |i|
   
-    config.vm.provider "virtualbox" do | vbox |
+     config.vm.define :"worker-#{i}" do |worker|
+
+      worker.vm.hostname = "worker-#{i}"
+      worker.vm.network :private_network, ip: "192.168.50.1#{i}"
+      worker.vm.provider "virtualbox" do | vbox |
     
-      vbox.memory = 2048
-      vbox.cpus = 2
-    
-      unless File.exist?(node1_disk1)
-        vbox.customize ['createhd', '--filename', node1_disk1, '--size', 10 * 1024]
-        vbox.customize ['createhd', '--filename', node1_disk2, '--size', 10 * 1024]
-      end
-      vbox.customize ['storageattach', :id, '--storagectl', 'SATA Controller', '--port', 1, '--device', 0, '--type', 'hdd', '--medium', node1_disk1]
-      vbox.customize ['storageattach', :id, '--storagectl', 'SATA Controller', '--port', 2, '--device', 0, '--type', 'hdd', '--medium', node1_disk2]
-    end
-  
-  end
-  
-  config.vm.define "node2" do |node|
-  
-    config.vm.network "private_network", ip: "192.168.50.2"
-    
-    node2_disk1 = "node2_disk1.vdi"
-    node2_disk2 = "node2_disk2.vdi"
-  
-    config.vm.provider "virtualbox" do | vbox |
-    
-      vbox.memory = 2048
-      vbox.cpus = 2
+        vbox.memory = 3072
+        vbox.cpus = 2
       
-      unless File.exist?(node2_disk1)
-        vbox.customize ['createhd', '--filename', node2_disk1, '--size', 10 * 1024]
-        vbox.customize ['createhd', '--filename', node2_disk2, '--size', 10 * 1024]
       end
-      vbox.customize ['storageattach', :id, '--storagectl', 'SATA Controller', '--port', 1, '--device', 0, '--type', 'hdd', '--medium', node2_disk1]
-      vbox.customize ['storageattach', :id, '--storagectl', 'SATA Controller', '--port', 2, '--device', 0, '--type', 'hdd', '--medium', node2_disk2]
     end
+  end
+
+  config.vm.define :"ceph-1" do |ceph|
+
+    ceph.vm.hostname = "ceph-1"
+    ceph.vm.network :private_network, ip: "192.168.50.13"
+    ceph.vm.provider "virtualbox" do | vbox |
     
+      vbox.memory = 1024
+      vbox.cpus = 1
+      
+    end
   end
   
   ## For masterless, mount your salt file root

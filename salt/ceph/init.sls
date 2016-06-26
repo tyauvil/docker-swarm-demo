@@ -1,0 +1,2 @@
+ceph:
+  pkg.installed:
