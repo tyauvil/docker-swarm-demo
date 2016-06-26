@@ -3,7 +3,7 @@
 
 Vagrant.configure(2) do |config|
 
-  config.vm.box = "ubuntu/trusty64"
+  config.vm.box = "boxcutter/ubuntu1604"
 
   if Vagrant.has_plugin?("vagrant-cachier")
     config.cache.scope = :box
@@ -33,18 +33,6 @@ Vagrant.configure(2) do |config|
         vbox.cpus = 2
       
       end
-    end
-  end
-
-  config.vm.define :"ceph-1" do |ceph|
-
-    ceph.vm.hostname = "ceph-1"
-    ceph.vm.network :private_network, ip: "192.168.50.13"
-    ceph.vm.provider "virtualbox" do | vbox |
-    
-      vbox.memory = 1024
-      vbox.cpus = 1
-      
     end
   end
   
